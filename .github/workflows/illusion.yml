@@ -1,0 +1,17 @@
+name: IllusionLoop
+on:
+  schedule:
+    - cron: '0 6,14,22 * * *'   # 06:00 14:00 22:00 UTC
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: pip install -r requirements.txt
+      - run: python agents/hook_harvester.py
+      - run: python agents/idea.py
+      - run: python agents/render.py
+      - run: python agents/upload.py ${{ secrets.YT_API_KEY }} ${{ secrets.TELEGRAM_TOKEN }} ${{ secrets.TELEGRAM_CHAT_ID }}
+      - run: rm -f *.mp4 *.wav *.txt
